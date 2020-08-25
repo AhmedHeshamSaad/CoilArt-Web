@@ -2,47 +2,57 @@ import pandas as pd
 import pyodbc
 
 
-def Item_extract(conn, ITEMID):
-    """
-    Description: Get Lines and BOMs in zero level 
+class Item:
+    def __init__(self, PN, Qty, UNITID, Parent, BOM=None):
+        self.PN = PN
+        self.UNITID = UNITID
+        self.parent = Parent
+        self.BOM = BOM
 
-    Inputs: 
-    conn    database connection object 
-    ITEMID  input of item of interest 
 
-    Outputs:
-    LinesDF  Lines at zero level 
-    BOMDF    BOMs at zero level 
-    """
+def Zero(conn, PN):
+    List = []
+    Lup = Item_extract(conn, PN)
+    if Lup:
+        for Item in Lup:
+            tmp = Zero(conn, Item)
+            if isinstance(tmp, list):
+                List.extend(tmp)
+            elif isinstance(tmp, str):
+                List.append(tmp)
+        return List
+    return PN
 
+
+def Item_extract(conn, ITEMID, DF=False):
     BOMID = IsBOM(conn, ITEMID)
-    # print(BOMID)
+    container = []
     if BOMID:
         cursor = conn.cursor()
+
+        if DF:
+            cursor.execute("""
+                SELECT ITEMID, BOMQTY, UNITID 
+                FROM BOM 
+                WHERE BOMID= ?""", BOMID)
+            lines = cursor.fetchall()  # list of tuples
+            LinesDF = pd.DataFrame.from_records(
+                lines, columns=['PN', 'QTY', 'Unit'])
+            return LinesDF
+
         cursor.execute("""
-            SELECT ITEMID, BOMQTY, UNITID 
+            SELECT ITEMID
             FROM BOM 
             WHERE BOMID= ?""", BOMID)
-        lines = cursor.fetchall()
-        LinesDF = pd.DataFrame.from_records(
-            lines, columns=['PN', 'QTY', 'Unit'])
-        return LinesDF
+        lines = cursor.fetchall()  # list of tuples
+        for PN in lines:
+            container.append(PN[0])
+        return container
 
     return None
 
 
 def IsBOM(conn, ITEMID):
-    """
-    Description: get the active version of input ITEMID
-
-    Inputs: 
-    conn    database connection object (type database)
-    ITEMID  input of item of interest (type string)
-
-    Outputs:
-    BOMID   The active version of ITEMID (type cell)
-    if ITEMID is not BOM or doesn't have active version, return None
-    """
     cursor = conn.cursor()
     cursor.execute("""
         SELECT BOMID
