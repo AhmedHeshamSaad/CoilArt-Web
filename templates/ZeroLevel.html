@@ -41,19 +41,19 @@
                 <tbody>
                     {% if not row_data %}
                     <tr>
-                        <td>143-0600-050</td>
-                        <td>Heat Exchanging Unit Aurora SON70.3CL-RR</td>
-                        <td>1</td>
-                        <td>EA</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
                         <td></td>
                     </tr>
                     {% else %}
                     {% for row in row_data %}
                     <tr>
                         <td>{{row[0]}}</td>
-                        <td></td>
+                        <td>{{row[3]}}</td>
+                        <td>{{"%.3f"|format(row[2])}}</td>
                         <td>{{row[1]}}</td>
-                        <td>{{row[2]}}</td>
                         <td></td>
                     </tr>
                     {% endfor %}

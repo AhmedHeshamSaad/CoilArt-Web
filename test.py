@@ -7,20 +7,33 @@ conn = pyodbc.connect('Driver={SQL Server};'
                       'Database=AutoCool_AX6_Live;'
                       'Trusted_Connection=yes;')
 
-PN = ["143-0600-020"]
-# PN = "151-0102-036"
+with conn:
+    PN = ["143-0600-020"]
+    # PN = "151-0102-036"
 
-# LinesDF = Item_extract(conn, PN)
+    # LinesDF = Item_extract(conn, PN)
 
-# for index, row in LinesDF.iterrows():
-#     print(row['PN'])
+    # for index, row in LinesDF.iterrows():
+    #     print(row['PN'])
 
-# print(LinesDF)
+    # print(LinesDF)
 
-ZeroLevel = Zero(conn, PN[0])
+    PN, Qty, Unit = Zero(conn, PN)
+    # Description = Name(conn, PN)
 
-df = pd.DataFrame(ZeroLevel, columns=["PN"])
-print(df)
+    df = pd.DataFrame({
+        "PN": PN,
+        "Qty": Qty,
+        "Unit": Unit
+    })
 
-# with pd.ExcelWriter('output.xlsx') as writer:
-#     df.to_excel(writer, sheet_name='Sheet_name_1')
+    cdf = df.groupby(by=["PN", "Unit"]).sum()
+    print(cdf)
+
+    # cdf['test'] = cdf.index
+    cdf.reset_index(level=['PN', 'Unit'], inplace=True)
+    print(cdf)
+    print(list(cdf.loc[:, 'PN']))
+
+    # with pd.ExcelWriter('output.xlsx') as writer:
+    #     cdf.to_excel(writer, sheet_name='Sheet_name_1')

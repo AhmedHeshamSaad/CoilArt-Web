@@ -1,5 +1,6 @@
 import pandas as pd
 import pyodbc
+import itertools
 
 
 class Item:
@@ -10,23 +11,43 @@ class Item:
         self.BOM = BOM
 
 
-def Zero(conn, PN):
-    List = []
-    Lup = Item_extract(conn, PN)
-    if Lup:
-        for Item in Lup:
-            tmp = Zero(conn, Item)
-            if isinstance(tmp, list):
-                List.extend(tmp)
-            elif isinstance(tmp, str):
-                List.append(tmp)
-        return List
-    return PN
+def Zero(conn, Item, Qty=1, Unit="EA"):
+    PNList, BOMQTYList, UNITIDList = [], [], []
+    PNcontainer, BOMQTYcontainer, UNITIDcontainer = Item_extract(conn, Item)
+    if PNcontainer and BOMQTYcontainer and UNITIDcontainer:
+        for (PN, BOMQTY, UNITID) in itertools.zip_longest(PNcontainer, BOMQTYcontainer, UNITIDcontainer):
+            PNtmp, BOMQTYtmp, UNITIDtmp = Zero(conn, PN, 1, UNITID)
+            if isinstance(PNtmp, list):
+                PNList.extend(PNtmp)
+                BOMQTYList.extend(i * BOMQTY for i in BOMQTYtmp)
+                UNITIDList.extend(UNITIDtmp)
+            elif isinstance(PNtmp, str):
+                PNList.append(PNtmp)
+                BOMQTYList.append(BOMQTYtmp * BOMQTY)
+                UNITIDList.append(UNITIDtmp)
+        return PNList, BOMQTYList, UNITIDList
+
+    # DescriptionList = Name(conn, PNList)
+    return Item, Qty, Unit
+
+
+def Name(conn, PNList):
+    Names = []
+    for PN in PNList:
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT NAME
+            FROM INVENTITEMPRICECOMPAREITEMVIEW
+            WHERE ITEMID = ?
+            """, PN)
+        Names.append(cursor.fetchall()[0][0])
+
+    return Names
 
 
 def Item_extract(conn, ITEMID, DF=False):
     BOMID = IsBOM(conn, ITEMID)
-    container = []
+    PNcontainer, BOMQTYcontainer, UNITIDcontainer = [], [], []
     if BOMID:
         cursor = conn.cursor()
 
@@ -41,15 +62,17 @@ def Item_extract(conn, ITEMID, DF=False):
             return LinesDF
 
         cursor.execute("""
-            SELECT ITEMID
+            SELECT ITEMID, BOMQTY, UNITID
             FROM BOM 
             WHERE BOMID= ?""", BOMID)
         lines = cursor.fetchall()  # list of tuples
-        for PN in lines:
-            container.append(PN[0])
-        return container
+        for PN, BOMQTY, UNITID in lines:
+            PNcontainer.append(PN)
+            BOMQTYcontainer.append(BOMQTY)
+            UNITIDcontainer.append(UNITID)
+        return PNcontainer, BOMQTYcontainer, UNITIDcontainer
 
-    return None
+    return None, None, None
 
 
 def IsBOM(conn, ITEMID):

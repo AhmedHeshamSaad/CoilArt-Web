@@ -19,9 +19,21 @@ def home():
 @app.route("/ZeroLevel", methods=["GET", "POST"])
 def ZeroLevel():
     if request.method == "GET":
-        return render_template("ZeroLevel.html")
+        return render_template("ZeroLevel.html", PN="_")
     else:
         PN = request.form.get("PN")
-        LinesDF = Item_extract(conn, PN)
-        row_data = list(LinesDF.values.tolist())
+        with conn:
+            PNs, Qty, Unit = Zero(conn, PN)
+        df = pd.DataFrame({
+            "PN": PNs,
+            "Qty": Qty,
+            "Unit": Unit
+        })
+        df = df.groupby(['PN', 'Unit']).sum()
+        df.reset_index(level=['PN', 'Unit'], inplace=True)
+        PNs = list(df.loc[:, 'PN'])
+        with conn:
+            Description = Name(conn, PNs)
+        df['Description'] = Description
+        row_data = list(df.values.tolist())
         return render_template("ZeroLevel.html", PN=PN, row_data=row_data)
