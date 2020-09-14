@@ -7,9 +7,9 @@
 <!-- Topbar Search -->
 <div class="row mb-4">
     <form action="/ZeroLevel" method="POST"
-        class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
+        class="d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
         <div class="input-group">
-            <input name="PN" type="text" class="form-control bg-light border-0 small" placeholder="Search for..."
+            <input name="PN" type="text" class="form-control bg-gray border-1 small" placeholder="Search for..."
                 aria-label="Search" aria-describedby="basic-addon2">
             <div class="input-group-append">
                 <button class="btn btn-primary" type="submit">
@@ -18,13 +18,30 @@
                 </button>
             </div>
         </div>
+        <div class="custom-control custom-checkbox my-1 mr-sm-2">
+            <input type="checkbox" class="custom-control-input" id="customCheck1" value="1" name="checkbox" checked>
+            <label class="custom-control-label" for="customCheck1">
+                Check, if you're going to export an excel sheet.</label>
+        </div>
     </form>
 </div>
 
 <!-- DataTales Example -->
 <div class="card shadow mb-4">
     <div class="card-header py-3">
-        <h6 class="m-0 font-weight-bold text-primary">Zero Level of {{ PN }}</h6>
+        <div class="row">
+            <div class="col">
+                <h6 class="my-2 font-weight-bold text-primary ">Zero Level of {{ PN }}</h6>
+            </div>
+            <div class="col">
+                <form action="/ZeroLevel/download" method="post">
+                    <button type="submit" class="btn btn-primary float-right">
+                        <i class="fas fa-download fa-sm"></i>
+                        Download
+                    </button>
+                </form>
+            </div>
+        </div>
     </div>
     <div class="card-body">
         <div class="table-responsive">

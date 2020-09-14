@@ -11,6 +11,20 @@ class Item:
         self.BOM = BOM
 
 
+def Name(conn, PNList):
+    Names = []
+    for PN in PNList:
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT NAME
+            FROM INVENTITEMPRICECOMPAREITEMVIEW
+            WHERE ITEMID = ?
+            """, PN)
+        Names.append(cursor.fetchall()[0][0])
+
+    return Names
+
+
 def Zero(conn, Item, Qty=1, Unit="EA"):
     PNList, BOMQTYList, UNITIDList = [], [], []
     PNcontainer, BOMQTYcontainer, UNITIDcontainer = Item_extract(conn, Item)
@@ -29,20 +43,6 @@ def Zero(conn, Item, Qty=1, Unit="EA"):
 
     # DescriptionList = Name(conn, PNList)
     return Item, Qty, Unit
-
-
-def Name(conn, PNList):
-    Names = []
-    for PN in PNList:
-        cursor = conn.cursor()
-        cursor.execute("""
-            SELECT NAME
-            FROM INVENTITEMPRICECOMPAREITEMVIEW
-            WHERE ITEMID = ?
-            """, PN)
-        Names.append(cursor.fetchall()[0][0])
-
-    return Names
 
 
 def Item_extract(conn, ITEMID, DF=False):
