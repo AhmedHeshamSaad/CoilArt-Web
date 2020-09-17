@@ -1,15 +1,20 @@
 from flask import Flask, redirect, render_template, request, send_from_directory, abort
 import pandas as pd
 import pyodbc
-from CoilArt import Zero, Name
+from CoilArt import Zero, Name, cleanZeroLevel, initmenu
 import time
+import sqlite3
 
 app = Flask(__name__)
 
-conn = pyodbc.connect('Driver={ODBC Driver 17 for SQL Server};'
-                      'Server=SQL-SERVER;'
-                      'Database=AutoCool_AX6_Live;'
-                      'Trusted_Connection=yes;')
+AXconn = pyodbc.connect('Driver={ODBC Driver 17 for SQL Server};'
+                        'Server=SQL-SERVER;'
+                        'Database=AutoCool_AX6_Live;'
+                        'Trusted_Connection=yes;')
+
+Path_SQLite3Database = "D:\\redirect\\Desktop\\CoilArt-Web\\static\\database\\"
+ACCconn = sqlite3.connect(Path_SQLite3Database +
+                          "ACC.db", check_same_thread=False)
 
 FileName_ZeroLevel = "NA"
 Path_ZeroLevel = "D:\\redirect\\Desktop\\CoilArt-Web\\static\\ZeroLevel\\"
@@ -24,13 +29,12 @@ def home():
 @app.route("/ZeroLevel", methods=["GET", "POST"])
 def ZeroLevel():
     global FileName_ZeroLevel
-    if request.method == "GET":
-        return render_template("ZeroLevel.html", PN="_")
-    else:
+    if request.method == "POST":
         PN = request.form.get("PN")
         # In case extracting has any error, return to ZeroLevel page
         try:
-            df = cleanZeroLevel(PN)  # check function below in this file
+            # check function below in this file
+            df = cleanZeroLevel(PN, AXconn)
         except:
             return render_template("ZeroLevel.html", PN="_")
 
@@ -45,6 +49,8 @@ def ZeroLevel():
         row_data = list(df.values.tolist())
         return render_template("ZeroLevel.html", PN=PN, row_data=row_data)
 
+    return render_template("ZeroLevel.html", PN="_")
+
 
 @app.route("/ZeroLevel/download", methods=["GET", "POST"])
 def download_ZeroLevel():
@@ -57,26 +63,14 @@ def download_ZeroLevel():
 
 @app.route("/ACC")
 def ACC():
-    return render_template("ACC.html")
+    menu = initmenu(ACCconn)
+    return render_template("ACC.html", menu=menu)
 
 
-def cleanZeroLevel(PN):
-    """
-    Return clean dataframe of Zero level with descriptions in the following order
-    PN, Unit, Qty, Description
-    using my functions defined in CoilArt.py
-    """
-    with conn:
-        PNs, Qty, Unit = Zero(conn, PN)
-    df = pd.DataFrame({
-        "PN": PNs,
-        "Qty": Qty,
-        "Unit": Unit
-    })
-    df = df.groupby(['PN', 'Unit']).sum()
-    df.reset_index(level=['PN', 'Unit'], inplace=True)
-    PNs = list(df.loc[:, 'PN'])
-    with conn:
-        Description = Name(conn, PNs)
-    df['Description'] = Description
-    return df
+@app.route("/CodeNomenclature")
+def CodeNomenclature():
+    return render_template("CodeNomenclature.html")
+
+
+if __name__ == "__main__":
+    app.run(debug=True, host="0.0.0.0")

@@ -86,3 +86,49 @@ def IsBOM(conn, ITEMID):
         return None
 
     return BOMID[0][0]
+
+
+def cleanZeroLevel(PN, AXconn):
+    """
+    Return clean dataframe of Zero level with descriptions in the following order
+    PN, Unit, Qty, Description
+    using my functions defined in CoilArt.py
+    """
+    with AXconn:
+        PNs, Qty, Unit = Zero(AXconn, PN)
+    df = pd.DataFrame({
+        "PN": PNs,
+        "Qty": Qty,
+        "Unit": Unit
+    })
+    df = df.groupby(['PN', 'Unit']).sum()
+    df.reset_index(level=['PN', 'Unit'], inplace=True)
+    PNs = list(df.loc[:, 'PN'])
+    with AXconn:
+        Description = Name(AXconn, PNs)
+    df['Description'] = Description
+    return df
+
+
+def initmenu(ACCconn):
+    """
+    Return dict where values is the Selector ID and values are options list.
+    """
+    menu = dict()
+    with ACCconn:
+        # FTPattern menu
+        cur = ACCconn.cursor()
+        cur.execute("SELECT DISTINCT Pattern FROM FinPress;")
+        data = cur.fetchall()  # list of tuples
+        FTPattern = pd.DataFrame.from_records(
+            data, columns=['FTPattern'])
+        # FTDiameter menu
+        cur.execute("SELECT DISTINCT Diameter FROM FinPress;")
+        data = cur.fetchall()  # list of tuples
+        FTDiameter = pd.DataFrame.from_records(
+            data, columns=['FTDiameter'])
+
+    menu["FTPattern"] = list(FTPattern["FTPattern"].values.tolist())
+    menu["FTDiameter"] = list(FTDiameter["FTDiameter"].values.tolist())
+
+    return menu
