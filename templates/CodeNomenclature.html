@@ -1,0 +1,291 @@
+{% extends "layout-SB2.html" %}
+
+{% block body %}
+<!-- app header selector -->
+<div class="row mb-4 py-2">
+    <div class="col-md-6">
+        <h1 class="h3 mb-0 font-weight-bold text-primary">Code & Nomenclature</h1>
+        <p class="">App to code new products and raw material according to Autocool's standard.</p>
+    </div>
+
+    <div class="col-xl-6 pr-0">
+        <div class="dropdown show col-md-8 float-right">
+            <select name="WhatSelector" id="WhatSelector" class="form-control btn btn-primary dropdown-toggle"
+                aria-haspopup="true" aria-expanded="false" autocomplete="off">
+                <div class="dropdown-menu" aria-labelledby="WhatSelector">
+                    <option disabled>Coils</option>
+                    <option value="FTCoil" selected="selected">F&T Coil</option>
+                    <option value="PFCoil">Parallel Flow</option>
+                    <option disabled>Row Material</option>
+                    <option value="Fin">Fin</option>
+                    <option value="Tube">Tube</option>
+                    <option value="FlateTube">Flate Tube</option>
+                    <option value="SheetMetal">Sheet Metal</option>
+                    <option value="">Manifold</option>
+                    <option disabled>OEM</option>
+                    <option value="CBU">CBU</option>
+                    <option value="CKD">CKD</option>
+                </div>
+            </select>
+        </div>
+    </div>
+
+</div>
+
+
+<!-- F&T Coil Card -->
+<div class="card shadow mb-4" id="FTCoil">
+    <!-- Card Header -->
+    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+        <h6 class="m-0 font-weight-bold text-primary">F&T Coil</h6>
+    </div>
+    <!-- Card Body -->
+    <div class="card-body row">
+        <div class="col-sm-4">
+            <div class="form-group row no-gutters">
+                <label for="FTType" class="col-xl-4 col-form-label">Type</label>
+                <div class="dropdown show col-xl-6 mr-2">
+                    <select name="FTType" id="FTType" class="form-control btn btn-secondary dropdown-toggle"
+                        aria-haspopup="true" aria-expanded="false" autocomplete="off">
+                        <div class="dropdown-menu" aria-labelledby="FTType">
+                            <option disabled selected value> -- select an option -- </option>
+                            <option value="EVAP">EVAP (Evaporator)</option>
+                            <option value="COND">COND (Condenser)</option>
+                            <option value="RAD">RAD (Radiator)</option>
+                            <option value="HTR">HTR (Heater)</option>
+                            <option value="Combi">Combi (shared end plate)</option>
+                        </div>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group row no-gutters">
+                <label for="FTMaterial" class="col-xl-4 col-form-label">Material</label>
+                <div class="dropdown show col-xl-6 mr-2">
+                    <select name="FTMaterial" id="FTMaterial" class="form-control btn btn-secondary dropdown-toggle"
+                        aria-haspopup="true" aria-expanded="false" autocomplete="off">
+                        <div class="dropdown-menu" aria-labelledby="FTMaterial">
+                            <option disabled selected value> -- select an option -- </option>
+                            <option value="Al">Al (Aluminium)</option>
+                            <option value="Cu">Cu (Copper)</option>
+                        </div>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group row no-gutters">
+                <label for="FTPattern" class="col-xl-4 col-form-label">Pattern</label>
+                <div class="dropdown show col-xl-6 mr-2">
+                    <select name="FTPattern" id="FTPattern" class="form-control btn btn-secondary dropdown-toggle"
+                        aria-haspopup="true" aria-expanded="false" autocomplete="off">
+                        <div class="dropdown-menu" aria-labelledby="FTPattern">
+                            <option disabled selected value> -- select an option -- </option>
+                            <option value="2512">25.4x12.7</option>
+                            <option value="1516">25.4x15.9</option>
+                            <option value="2522">25.4x22</option>
+                            <option value="1916">19.05x16.5</option>
+                            <option value="3127">31.75x27.5</option>
+                        </div>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="form-group row no-gutters">
+                <label for="FTFPI" class="col-xl-4 col-form-label">FPI</label>
+                <input type="text" class="form-control col-xl-6 mr-2" id="FTFPI" value="">
+            </div>
+            <div class="form-group row no-gutters">
+                <label for="FTRows" class="col-xl-4 col-form-label">No of rows</label>
+                <input type="text" class="form-control col-xl-6 mr-2" id="FTRows" value="">
+            </div>
+            <div class="form-group row no-gutters">
+                <label for="FTTubes" class="col-xl-4 col-form-label">Tube / row</label>
+                <input type="text" class="form-control col-xl-6 mr-2" id="FTTubes" value="">
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="form-group row no-gutters">
+                <label for="FTLength" class="col-xl-4 col-form-label">Core length, mm</label>
+                <input type="text" class="form-control col-xl-6 mr-2" id="FTLength" value="">
+            </div>
+            <div class="form-group row no-gutters">
+                <label for="FTCircuits" class="col-xl-4 col-form-label">No of circuits</label>
+                <input type="text" class="form-control col-xl-6 mr-2" id="FTCircuits" value="">
+            </div>
+            <div class="form-group row no-gutters">
+                <label for="FTComment" class="col-xl-4 col-form-label">Comment</label>
+                <input type="text" class="form-control col-xl-6 mr-2" id="FTComment" value="">
+            </div>
+        </div>
+        <div class="custom-control custom-checkbox row no-gutters ml-3">
+            <input type="checkbox" class="custom-control-input" id="Vshape">
+            <label class="custom-control-label" for="Vshape">
+                Check, if V-Shape.</label>
+        </div>
+    </div>
+</div>
+
+
+<!-- PF Coil Card -->
+<div class="card shadow mb-4" id="PFCoil" style="display: none">
+    <!-- Card Header -->
+    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+        <h6 class="m-0 font-weight-bold text-primary">PF Coil</h6>
+    </div>
+    <!-- Card Body -->
+    <div class="card-body row">
+        <div class="col-sm-4">
+            <div class="form-group row no-gutters">
+                <label for="FTType" class="col-xl-4 col-form-label">Type</label>
+                <div class="dropdown show col-xl-6 mr-2">
+                    <select name="FTType" id="FTType" class="form-control btn btn-secondary dropdown-toggle"
+                        aria-haspopup="true" aria-expanded="false" autocomplete="off">
+                        <div class="dropdown-menu" aria-labelledby="FTType">
+                            <option disabled selected value> -- select an option -- </option>
+                            <option value="EVAP">EVAP (Evaporator)</option>
+                            <option value="COND">COND (Condenser)</option>
+                            <option value="RAD">RAD (Radiator)</option>
+                            <option value="HTR">HTR (Heater)</option>
+                            <option value="CAC">CAC (Charge-air Cooler)</option>
+                        </div>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group row no-gutters">
+                <label for="FTMaterial" class="col-xl-4 col-form-label">Manifold Type</label>
+                <div class="dropdown show col-xl-6 mr-2">
+                    <select name="FTMaterial" id="FTMaterial" class="form-control btn btn-secondary dropdown-toggle"
+                        aria-haspopup="true" aria-expanded="false" autocomplete="off">
+                        <div class="dropdown-menu" aria-labelledby="FTMaterial">
+                            <option disabled selected value> -- select an option -- </option>
+                            <option value="O">Round Manifold</option>
+                            <option value="S">Square Manifold</option>
+                            <option value="D">D Manifold</option>
+                            <option value="C">Custom Manifold (OEM)</option>
+                        </div>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group row no-gutters">
+                <label for="FTPattern" class="col-xl-4 col-form-label">Man-Tube-FH</label>
+                <div class="dropdown show col-xl-6 mr-2">
+                    <select name="FTPattern" id="FTPattern" class="form-control btn btn-secondary dropdown-toggle"
+                        aria-haspopup="true" aria-expanded="false" autocomplete="off">
+                        <div class="dropdown-menu" aria-labelledby="FTPattern">
+                            <option disabled selected value> -- select an option -- </option>
+                            <option value="16128">16-12-8</option>
+                            <option value="19168">25.4x15.9</option>
+                            <option value="25206">25.4x22</option>
+                            <option value="25208">19.05x16.5</option>
+                            <option value="25209">31.75x27.5</option>
+                            <option value="32"></option>
+                        </div>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="form-group row no-gutters">
+                <label for="FTFPI" class="col-xl-4 col-form-label">FPI</label>
+                <input type="text" class="form-control col-xl-6 mr-2" id="FTFPI" value="">
+            </div>
+            <div class="form-group row no-gutters">
+                <label for="FTRows" class="col-xl-4 col-form-label">No of rows</label>
+                <input type="text" class="form-control col-xl-6 mr-2" id="FTRows" value="">
+            </div>
+            <div class="form-group row no-gutters">
+                <label for="FTTubes" class="col-xl-4 col-form-label">Tube / row</label>
+                <input type="text" class="form-control col-xl-6 mr-2" id="FTTubes" value="">
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="form-group row no-gutters">
+                <label for="FTLength" class="col-xl-4 col-form-label">Core length, mm</label>
+                <input type="text" class="form-control col-xl-6 mr-2" id="FTLength" value="">
+            </div>
+            <div class="form-group row no-gutters">
+                <label for="FTCircuits" class="col-xl-4 col-form-label">No of circuits</label>
+                <input type="text" class="form-control col-xl-6 mr-2" id="FTCircuits" value="">
+            </div>
+            <div class="form-group row no-gutters">
+                <label for="FTComment" class="col-xl-4 col-form-label">Comment</label>
+                <input type="text" class="form-control col-xl-6 mr-2" id="FTComment" value="">
+            </div>
+        </div>
+        <div class="custom-control custom-checkbox row no-gutters ml-3">
+            <input type="checkbox" class="custom-control-input" id="Double">
+            <label class="custom-control-label" for="Double">
+                Check, if Double manifold.</label>
+        </div>
+    </div>
+</div>
+
+
+<!-- DataTable -->
+<div class="card shadow mb-4">
+    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+        <button type="submit" class="btn btn-primary" onclick="CodeBtnFunction()">Code</button>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>PN</th>
+                        <th>Description</th>
+                        <th>Unit</th>
+                    </tr>
+                </thead>
+                <tbody id="TableBody"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Script to toggle between Cards -->
+<script>
+    // hide and show cards according to selection
+    preSelection = document.querySelector('#WhatSelector').value;
+    document.querySelector('#WhatSelector').onchange = function () {
+        $('#' + preSelection).toggle();
+        $('#' + this.value).toggle();
+        preSelection = this.value
+    }
+
+    // Code function
+    function CodeBtnFunction() {
+        InputCheck();
+        let card = document.querySelector('#WhatSelector').value;
+        if (card == "FTCoil") {
+            let V = "";
+            if (document.querySelector('#Vshape').checked) {
+                V = "v-";
+            }
+            let type = document.querySelector('#FTType').value;
+            let material = document.querySelector('#FTMaterial').value;
+            let pattern = document.querySelector('#FTPattern').value;
+            let FPI = document.querySelector('#FTFPI').value;
+            let R = document.querySelector('#FTRows').value;
+            let T = document.querySelector('#FTTubes').value;
+            let Core = document.querySelector('#FTLength').value;
+            let C = document.querySelector('#FTCircuits').value;
+            let comment = document.querySelector('#FTComment').value;
+
+            let Name = "FT " + V + type + " " + material + "-" + pattern + "-" + FPI + "-" + R + "R" + T + "T" + "-" +
+                Core + "-" + C + " (" + comment + ")";
+
+            const table = document.getElementById("TableBody");
+            let row = table.insertRow();
+            row.insertCell(0).innerHTML = 'Not Implementet yet';
+            row.insertCell(1).innerHTML = Name;
+            row.insertCell(2).innerHTML = 'EA';
+        } else if (card == "PFCoil") {
+
+        }
+
+    }
+
+    function InputCheck() {
+        // to be implemented later
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,257 @@
+{% extends "layout-SB2.html" %}
+
+{% block body %}
+<!-- app header selector -->
+<div class="row mb-4 py-2">
+    <div class="col-3">
+        <h1 class="h3 mb-0 font-weight-bold text-primary">ACC</h1>
+    </div>
+    <div class="col-9 pr-0">
+        <div class="dropdown show col-sm-12 col-md-6 col-lg-4 float-right">
+            <select name="WhatSelector" id="WhatSelector" class="form-control btn btn-primary dropdown-toggle"
+                aria-haspopup="true" aria-expanded="false" autocomplete="off">
+                <div class="dropdown-menu" aria-labelledby="WhatSelector">
+                    <option value="FTCard" selected="selected">Fin & Tube</option>
+                    <option value="PFCard">Parallel Flow</option>
+                    <option disabled></option>
+                    <option value="SMCard">Sheet Metal</option>
+                    <option value="" disabled>Manifold</option>
+                    <option disabled></option>
+                    <option value="" disabled>Tube</option>
+                    <option value="" disabled>Fitting</option>
+                    <option value="" disabled>Distributor</option>
+                    <option value="" disabled>Rod</option>
+                    <option value="" disabled>Service Valve</option>
+                    <option value="" disabled>Collector Caps</option>
+                    <option disabled></option>
+                    <option value="" disabled>Plastic & Rubber Plugs</option>
+                    <option value="" disabled>Brazing</option>
+                    <option value="" disabled>Return Bend</option>
+                    <option value="" disabled>Fasteners</option>
+                    <option value="" disabled>Painting</option>
+                </div>
+            </select>
+        </div>
+    </div>
+</div>
+
+
+<!-- Fin & Tube Card -->
+<div class="card shadow mb-4" id="FTCard">
+    <!-- Card Header -->
+    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+        <h6 class="m-0 font-weight-bold text-primary">Fin & Tube</h6>
+    </div>
+    <!-- Card Body -->
+    <div class="card-body row">
+        <div class="col-sm-4">
+            <div class="form-group row no-gutters">
+                <label for="FTPattern" class="col-xl-4 col-form-label">Pattern</label>
+                <div class="dropdown show col-xl-6 mr-2">
+                    <select name="FTPattern" id="FTPattern" class="form-control btn btn-secondary dropdown-toggle"
+                        aria-haspopup="true" aria-expanded="false" autocomplete="off">
+                        <div class="dropdown-menu" aria-labelledby="FTPattern">
+                            <option disabled selected value> -- select an option -- </option>
+                            {% for FTPattern in menu["FTPattern"] %}
+                            <option value={{FTPattern}}>{{FTPattern}}</option>
+                            {% endfor %}
+                        </div>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group row no-gutters">
+                <label for="TubeDiameter" class="col-xl-4 col-form-label">Tube Diameter</label>
+                <div class="dropdown show col-xl-6 mr-2">
+                    <select name="TubeDiameter" id="TubeDiameter" class="form-control btn btn-secondary dropdown-toggle"
+                        aria-haspopup="true" aria-expanded="false" autocomplete="off">
+                        <div class="dropdown-menu" aria-labelledby="TubeDiameter">
+                            <option disabled selected value> -- select an option -- </option>
+                            {% for FTDiameter in menu["FTDiameter"] %}
+                            <option value={{FTDiameter}}>{{FTDiameter}}</option>
+                            {% endfor %}
+                        </div>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group row no-gutters">
+                <label for="TubeMaterial" class="col-xl-4 col-form-label">Tube Material</label>
+                <input type="text" class="form-control col-xl-6 mr-2" id="TubeMaterial" value="">
+            </div>
+        </div>
+
+        <div class="col-sm-4">
+            <div class="form-group row no-gutters">
+                <label for="NoRows" class="col-xl-4 col-form-label">No. of rows</label>
+                <input type="text" class="form-control col-xl-6 mr-2" id="NoRows" value="">
+            </div>
+            <div class="form-group row no-gutters">
+                <label for="NoTubes" class="col-xl-4 col-form-label">Tubes / row</label>
+                <input type="text" class="form-control col-xl-6 mr-2" id="NoTubes" value="">
+            </div>
+            <div class="form-group row no-gutters">
+                <label for="TubeThickness" class="col-xl-4 col-form-label">Tube Thickness</label>
+                <input type="text" class="form-control col-xl-6 mr-2" id="TubeThickness" value="">
+            </div>
+        </div>
+
+        <div class="col-sm-4">
+            <div class="form-group row no-gutters">
+                <label for="FTCoreLength" class="col-xl-4 col-form-label">Core Length</label>
+                <input type="text" class="form-control col-xl-6 mr-2" id="FTCoreLength" value="">
+            </div>
+            <div class="form-group row no-gutters">
+                <label for="FTFPI" class="col-xl-4 col-form-label">FPI</label>
+                <input type="text" class="form-control col-xl-6 mr-2" id="FTFPI" value="">
+            </div>
+            <div class="form-group row no-gutters">
+                <label for="NoSkipTubes" class="col-xl-4 col-form-label">No. of skipped tubes</label>
+                <input type="text" class="form-control col-xl-6 mr-2" id="NoSkipTubes" value="">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- PF Card -->
+<div class="card shadow mb-4" id="PFCard" style="display: none">
+    <!-- Card Header -->
+    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+        <h6 class="m-0 font-weight-bold text-primary">Parallel Flow</h6>
+    </div>
+    <!-- Card Body -->
+    <div class="card-body row">
+        <div class="col-sm-4">
+            <div class="form-group row no-gutters">
+                <label for="PFType" class="col-xl-4 col-form-label">PF Type</label>
+                <input type="text" class="form-control col-xl-6 mr-2" id="PFType" value="">
+            </div>
+            <div class="form-group row no-gutters">
+                <label for="TubeWidth" class="col-xl-4 col-form-label">Tube Width</label>
+                <input type="text" class="form-control col-xl-6 mr-2" id="TubeWidth" value="">
+            </div>
+            <div class="form-group row no-gutters">
+                <label for="TubeHeight" class="col-xl-4 col-form-label">Tube Height</label>
+                <input type="text" class="form-control col-xl-6 mr-2" id="TubeHeight" value="">
+            </div>
+            <div class="form-group row no-gutters">
+                <label for="PFFPI" class="col-xl-4 col-form-label">FPI</label>
+                <input type="text" class="form-control col-xl-6 mr-2" id="PFFPI" value="">
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="form-group row no-gutters">
+                <label for="FinWidth" class="col-xl-4 col-form-label">Fin Width</label>
+                <input type="text" class="form-control col-xl-6 mr-2" id="FinWidth" value="">
+            </div>
+            <div class="form-group row no-gutters">
+                <label for="FinHeight" class="col-xl-4 col-form-label">Fin Height</label>
+                <input type="text" class="form-control col-xl-6 mr-2" id="FinHeight" value="">
+            </div>
+            <div class="form-group row no-gutters">
+                <label for="NoTubes" class="col-xl-4 col-form-label">No. of Tubes</label>
+                <input type="text" class="form-control col-xl-6 mr-2" id="NoTubes" value="">
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="form-group row no-gutters">
+                <label for="Noports" class="col-xl-4 col-form-label">No. of ports</label>
+                <input type="text" class="form-control col-xl-6 mr-2" id="Noports" value="">
+            </div>
+            <div class="form-group row no-gutters">
+                <label for="PFCoreLength" class="col-xl-4 col-form-label">Core Length</label>
+                <input type="text" class="form-control col-xl-6 mr-2" id="PFCoreLength" value="">
+            </div>
+            <div class="form-group row no-gutters">
+                <label for="PFCoreHeight" class="col-xl-4 col-form-label">Core Height</label>
+                <input type="text" class="form-control col-xl-6 mr-2" id="PFCoreHeight" value="">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Sheet Metal Card -->
+<div class="card shadow mb-4" id="SMCard" style="display: none">
+    <!-- Card Header -->
+    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+        <h6 class="m-0 font-weight-bold text-primary">Sheet Metal</h6>
+    </div>
+    <!-- Card Body -->
+    <div class="card-body row">
+        <div class="col-sm-6">
+            <div class="form-group row">
+                <label for="SMMaterial" class="col-xl-3 col-form-label">Material</label>
+                <div class="col-xl-3">
+                    <input type="text" class="form-control" id="SMMaterial" value="">
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="SMThickness" class="col-xl-3 col-form-label">Thickness</label>
+                <div class="col-xl-3">
+                    <input type="text" class="form-control" id="SMThickness" value="">
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="form-group row">
+                <label for="SMLength" class="col-xl-3 col-form-label">Length</label>
+                <div class="col-xl-3">
+                    <input type="text" class="form-control" id="SMLength" value="">
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="SMWidth" class="col-xl-3 col-form-label">Width</label>
+                <div class="col-xl-3">
+                    <input type="text" class="form-control" id="SMWidth" value="">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- DataTable -->
+<div class="card shadow mb-4">
+    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+        <form action="" method="post">
+            <button type="submit" class="btn btn-primary">Calculate</button>
+        </form>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>PN</th>
+                        <th>Description</th>
+                        <th>Qty</th>
+                        <th>Unit</th>
+                        <th>Note</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+<!-- Script to toggle between Cards -->
+<script>
+    preSelection = document.querySelector('#WhatSelector').value;
+
+    document.querySelector('#WhatSelector').onchange = function () {
+        $('#' + preSelection).toggle();
+        $('#' + this.value).toggle();
+        preSelection = this.value
+    }
+</script>
+{% endblock %}
