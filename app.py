@@ -28,15 +28,16 @@ def home():
 
 @app.route("/ZeroLevel", methods=["GET", "POST"])
 def ZeroLevel():
-    global FileName_ZeroLevel
+    # global FileName_ZeroLevel
     if request.method == "POST":
         PN = request.form.get("PN")
         # In case extracting has any error, return to ZeroLevel page
         try:
-            # check function below in this file
+            # for info, check the function below
             df = cleanZeroLevel(PN, AXconn)
         except:
-            return render_template("ZeroLevel.html", PN="_")
+            return render_template("ZeroLevel.html", PN="_", FileName_ZeroLevel="_")
+            # alert("Unvalid input")
 
         # export to excel file if user gonna download it
         if request.form.getlist("checkbox"):
@@ -47,14 +48,14 @@ def ZeroLevel():
 
         # return date to the template
         row_data = list(df.values.tolist())
-        return render_template("ZeroLevel.html", PN=PN, row_data=row_data)
+        return render_template("ZeroLevel.html", PN=PN, FileName_ZeroLevel=FileName_ZeroLevel, row_data=row_data)
 
-    return render_template("ZeroLevel.html", PN="_")
+    return render_template("ZeroLevel.html", PN="_", FileName_ZeroLevel="_")
 
 
-@app.route("/ZeroLevel/download", methods=["GET", "POST"])
-def download_ZeroLevel():
-    global FileName_ZeroLevel
+@app.route("/ZeroLevel/download/<FileName_ZeroLevel>")
+def download_ZeroLevel(FileName_ZeroLevel):
+    # global FileName_ZeroLevel
     try:
         return send_from_directory(app.config["ZeroLevel"], filename=FileName_ZeroLevel, as_attachment=True)
     except FileNotFoundError:
