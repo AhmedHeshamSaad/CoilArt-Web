@@ -4,6 +4,8 @@ import pyodbc
 from CoilArt import Zero, Name, cleanZeroLevel, initmenu
 import time
 import sqlite3
+from Nomenclature import Nomenclatures
+import json
 
 app = Flask(__name__)
 
@@ -68,9 +70,15 @@ def ACC():
     return render_template("ACC.html", menu=menu)
 
 
-@app.route("/CodeNomenclature")
-def CodeNomenclature():
-    return render_template("CodeNomenclature.html")
+# @app.route("/CodeNomenclature")
+# def CodeNomenclature():
+#     return render_template("CodeNomenclature.html")
+
+
+@app.route("/Nomenclature")
+def Nomenclature():
+    a = json.dumps([Nomenclatures])
+    return render_template("Nomenclature.html", Nomenclatures=Nomenclatures, Nomenclatures_json=a)
 
 
 if __name__ == "__main__":

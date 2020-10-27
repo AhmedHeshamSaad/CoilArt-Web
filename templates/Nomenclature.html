@@ -1,0 +1,179 @@
+{% extends "layout-SB2.html" %}
+
+{% block body %}
+<!-- app header selector -->
+<div class="row mb-4 py-2">
+    <div class="col-md-6">
+        <h1 class="h3 mb-0 font-weight-bold text-primary">Code & Nomenclature</h1>
+        <p class="">App to code new products and raw material according to Autocool's standard.</p>
+    </div>
+
+    <div class="col-xl-6 pr-0">
+        <div class="dropdown show col-md-8 float-right">
+            <select name="WhatSelector" id="WhatSelector" class="form-control btn btn-primary dropdown-toggle"
+                aria-haspopup="true" aria-expanded="false" autocomplete="off">
+                <div class="dropdown-menu" aria-labelledby="WhatSelector">
+                    {% for Nomenclature in Nomenclatures.keys() %}
+                    <option value={{Nomenclatures[Nomenclature]["ID"]}}>{{Nomenclature}}</option>
+                    {% endfor %}
+                </div>
+            </select>
+        </div>
+    </div>
+</div>
+
+
+<!-- Jinja Card Template -->
+{% for Nomenclature in Nomenclatures.keys() %}
+<!-- Template Card -->
+<div class="card shadow mb-4" id={{Nomenclatures[Nomenclature]["ID"]}} style="display: none">
+    <!-- Card Header -->
+    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+        <h6 class="m-0 font-weight-bold text-primary">{{Nomenclature}}</h6>
+    </div>
+    <!-- Card Body -->
+    <div class="card-body row">
+        {%- for ParameterColumn in Nomenclatures[Nomenclature]["Parameters"].keys()|batch(3) %}
+        <div class="col-sm-4">
+            {% for Parameter in ParameterColumn %}
+            <div class="form-group row no-gutters">
+                <label for={{Parameter}} class="col-xl-4 col-form-label">{{Parameter}}</label>
+                {% if Nomenclatures[Nomenclature]['Parameters'][Parameter]['list'] %}
+                <div class="dropdown show col-xl-6 mr-2">
+                    <select name={{Parameter}} id={{Nomenclatures[Nomenclature]['Parameters'][Parameter]['ID']}}
+                        class="form-control btn btn-secondary dropdown-toggle" aria-haspopup="true"
+                        aria-expanded="false" autocomplete="off">
+                        <div class="dropdown-menu" aria-labelledby={{Parameter}}>
+                            <option disabled selected value> -- select an option -- </option>
+                            {% for key, value in Nomenclatures[Nomenclature]['Parameters'][Parameter]['list'].items() %}
+                            <option value={{key}}>{{value}}</option>
+                            {% endfor %}
+                        </div>
+                    </select>
+                </div>
+                {% else %}
+                <input type="text" class="form-control col-xl-6 mr-2"
+                    id={{Nomenclatures[Nomenclature]['Parameters'][Parameter]['ID']}} value="">
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        {%- endfor %}
+    </div>
+</div>
+{% endfor %}
+
+
+<!-- DataTable -->
+<div class="card shadow mb-4">
+    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+        <button type="submit" class="btn btn-primary" onclick="CodeBtnFunction()">Code</button>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>PN</th>
+                        <th>Description</th>
+                        <th>Unit</th>
+                    </tr>
+                </thead>
+                <tbody id="TableBody"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    // Script to toggle between Cards view
+    preSelection = document.querySelector('#WhatSelector').value;
+    document.querySelector('#' + preSelection).style.display = 'block';
+    document.querySelector('#WhatSelector').onchange = function () {
+        $('#' + preSelection).toggle();
+        $('#' + this.value).toggle();
+        preSelection = this.value
+    }
+
+    var obj = JSON.parse('{{Nomenclatures | tojson | safe}}');
+
+    // predefined nomenctature
+    /*
+    function CodeBtnFunction() {
+        // check user inputs
+        InputCheck();
+
+        let group = document.querySelector('#WhatSelector').value;
+
+        let card = document.querySelector('#WhatSelector').value;
+        if (card == "FT") {
+            let V = "";
+            if (document.querySelector('#FT_V-shape').checked) {
+                V = "v-";
+            }
+            let type = document.querySelector('#FT_Type').value;
+            let material = document.querySelector('#FT_Material').value;
+            let pattern = document.querySelector('#FT_Pattern').value;
+            let FPI = document.querySelector('#FT_FPI').value;
+            let R = document.querySelector('#FT_Rows').value;
+            let T = document.querySelector('#FT_Tubes').value;
+            let Core = document.querySelector('#FT_Core').value;
+            let C = document.querySelector('#FT_circuits').value;
+            let comment = document.querySelector('#FT_Comment').value;
+
+            let Name = "FT " + V + type + " " + material + "-" + pattern + "-" + FPI + "-" + R + "R" + T + "T" + "-" +
+                Core + "-" + C + " (" + comment + ")";
+
+            const table = document.getElementById("TableBody");
+            let row = table.insertRow();
+            row.insertCell(0).innerHTML = 'Not Implementet yet';
+            row.insertCell(1).innerHTML = Name;
+            row.insertCell(2).innerHTML = 'EA';
+        } else if (card == "PFCoil") {
+            // convert to template
+        }
+    }
+    */
+
+    // template from JSON object
+    function CodeBtnFunction() {
+        // check user inputs
+        InputCheck();
+
+        // create Nomenclature
+        current = document.querySelector('#WhatSelector');
+        current_card = current.options[current.selectedIndex].text;
+        var i;
+        var name = obj[current_card]['ID'];
+        var current_field, user_input, sep;
+        // loop through every field in JSON
+        for (i = 1; i <= obj[current_card]['n']; i++) {
+            current_field = getfield(obj, current_card, i);
+            user_input = document.getElementById(obj[current_card]['Parameters'][current_field]['ID']).value;
+            sep = obj[current_card]['Parameters'][current_field]['sep'];
+            name = name + user_input + sep;
+        }
+
+        // replace every underscore into space
+
+        const table = document.getElementById("TableBody");
+        let row = table.insertRow();
+        row.insertCell(0).innerHTML = 'Not Implementet yet';
+        row.insertCell(1).innerHTML = name;
+        row.insertCell(2).innerHTML = 'EA';
+    }
+
+    function InputCheck() {
+        // to be implemented later
+    }
+
+    function getfield(obj, current_card, n) {
+        for (var prop in obj[current_card]['Parameters']) {
+            if (obj[current_card]['Parameters'][prop]['n'] === n) {
+                return prop;
+            }
+        }
+    }
+</script>
+{% endblock %}

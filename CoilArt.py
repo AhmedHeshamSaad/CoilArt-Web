@@ -112,7 +112,7 @@ def cleanZeroLevel(PN, AXconn):
 
 def initmenu(ACCconn):
     """
-    Return dict where values is the Selector ID and values are options list.
+    Return dict where keys are the Selector ID and values are options list.
     """
     menu = dict()
     with ACCconn:
