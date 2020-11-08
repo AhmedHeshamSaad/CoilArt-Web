@@ -156,6 +156,11 @@
         }
 
         // replace every underscore into space
+        name = name.replace(/_/g, " ");
+        // replace every inch into "
+        name = name.replace(/inch/g, '\"');
+        // replace every -- into -
+        name = name.replace(/--/g, '-');
 
         const table = document.getElementById("TableBody");
         let row = table.insertRow();
