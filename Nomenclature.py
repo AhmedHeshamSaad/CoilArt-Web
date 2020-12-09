@@ -125,7 +125,8 @@ Nomenclatures['Parallel Flow Coil'] = {
             'list': {
                 'EVAP': 'EVAP (Evaporator)',
                 'COND': 'COND (Condenser)',
-                'RAD': 'RAD (Radiator)'
+                'RAD': 'RAD (Radiator)',
+                'HTR': 'HTR (Heater'
             },
             'sep': ' ',
             'ID': 'PF_Type'
@@ -216,8 +217,8 @@ Nomenclatures['Fitting'] = {
                 'Clamp_racor': 'Clamp racor (drain hose)',
                 'Adaptor': 'Adaptor',
                 'Nipple': 'Nipple',
-                'Tee': 'Tee (Threaded)',
-                'T_racor': 'T racor',
+                'T': 'T (Thread)',
+                'T_racor': 'T racor (for drain hoses)',
                 'Cap': 'Cap',
                 'Plug': 'Plug',
                 'Nut': 'Nut'
@@ -242,7 +243,7 @@ Nomenclatures['Fitting'] = {
             'list': {
                 'Al': 'Al',
                 'Brass': 'Brass',
-                'GSt': 'G.St.'
+                'G.St': 'G.St.'
             },
             'sep': '-',
             'ID': 'Fitting_Material'
@@ -291,5 +292,211 @@ Nomenclatures['Fitting'] = {
     }
 }
 
+Nomenclatures['Subassembly (Man, side plate, header, ...)'] = {
+    'n': 3,
+    'ID': 'Sub ',
+    'Parameters': {
+        'Subassembly Name': {
+            'n': 1,
+            'list': '',
+            'sep': '-',
+            'ID': 'Sub_name'
+        },
+        'Parrent Name': {
+            'n': 2,
+            'list': '',
+            'sep': ' (',
+            'ID': 'Sub_parrent'
+        },
+        'Comment, if any': {
+            'n': 3,
+            'list': '',
+            'sep': ')',
+            'ID': 'Sub_comment'
+        }
+    }
+}
+
+Nomenclatures['Rivet'] = {
+    'n': 6,
+    'ID': 'Rivet ',
+    'Parameters': {
+        'Material': {
+            'n': 1,
+            'list': {
+                'Al': 'Aluminum',
+                'G.St': 'Galvanized steel'
+            },
+            'sep': '-',
+            'ID': 'RivetMaterial'
+        },
+        'Head Type': {
+            'n': 2,
+            'list': {
+                'Domed_head': 'Domed Head',
+                'Countersunk_head': 'Countersunk_Head',
+                'Large_Flange_head': 'Large_Flange_Head'
+            },
+            'sep': '-',
+            'ID': 'RivetHeadType'
+        },
+        'Sealed': {
+            'n': 3,
+            'list': {
+                'sealed': 'True',
+                '': 'False'
+            },
+            'sep': '-',
+            'ID': 'RivetSealed'
+        },
+        'Diameter': {
+            'n': 4,
+            'list': '',
+            'sep': 'x',
+            'ID': 'RivetDiameter'
+        },
+        'Length': {
+            'n': 5,
+            'list': '',
+            'sep': 'mm (',
+            'ID': 'RivetLength'
+        },
+        'Comment, if any': {
+            'n': 6,
+            'list': '',
+            'sep': ')',
+            'ID': 'RivetComment'
+        }
+    }
+}
+
+Nomenclatures['Washer'] = {
+    'n': 5,
+    'ID': 'Washer ',
+    'Parameters': {
+        'Material': {
+            'n': 1,
+            'list': {
+                'Al': 'Aluminum',
+                'G.St': 'Galvanized steel',
+                'Rubber': 'Rubber'
+            },
+            'sep': '-',
+            'ID': 'WasherMaterial'
+        },
+        'Type': {
+            'n': 2,
+            'list': {
+                'Flat': 'Flat',
+                'Spring': 'Spring',
+                'Grooved': 'Grooved'
+            },
+            'sep': '-ID',
+            'ID': 'WasherType'
+        },
+        'Inner Diameter': {
+            'n': 3,
+            'list': '',
+            'sep': 'xOD',
+            'ID': 'WasherID'
+        },
+        'Outter Diameter': {
+            'n': 4,
+            'list': '',
+            'sep': 'mm (',
+            'ID': 'WasherOD'
+        },
+        'Comment, if any': {
+            'n': 5,
+            'list': '',
+            'sep': ')',
+            'ID': 'WasherComment'
+        }
+    }
+}
+
+Nomenclatures['Nut'] = {
+    'n': 5,
+    'ID': 'Nut ',
+    'Parameters': {
+        'Material': {
+            'n': 1,
+            'list': {
+                'Al': 'Aluminum',
+                'G.St': 'Galvanized steel'
+            },
+            'sep': '-',
+            'ID': 'NutMaterial'
+        },
+        'Type': {
+            'n': 2,
+            'list': {
+                'Hex': 'Hex',
+                'Nylock': 'Nylock',
+                'Flange': 'Flange',
+                'Wing': 'Wing',
+                'Jam': 'Jam',
+                'Square': 'Square'
+            },
+            'sep': '-M',
+            'ID': 'NutType'
+        },
+        'Thread M size': {
+            'n': 3,
+            'list': '',
+            'sep': 'x',
+            'ID': 'NutThread'
+        },
+        'Thread pitch': {
+            'n': 4,
+            'list': '',
+            'sep': 'mm (',
+            'ID': 'NutPitch'
+        },
+        'Comment, if any': {
+            'n': 5,
+            'list': '',
+            'sep': ')',
+            'ID': 'NutComment'
+        }
+    }
+}
+
+Nomenclatures['Foam'] = {
+    'n': 5,
+    'ID': 'Foam ',
+    'Parameters': {
+        'Type': {
+            'n': 1,
+            'list': '',
+            'sep': '-',
+            'ID': 'FoamType'
+        },
+        'Name': {
+            'n': 2,
+            'list': '',
+            'sep': '-',
+            'ID': 'FoamName'
+        },
+        'Dimension LxWxTh mm': {
+            'n': 3,
+            'list': '',
+            'sep': 'mm-',
+            'ID': 'FoamDim'
+        },
+        'Where Used': {
+            'n': 4,
+            'list': '',
+            'sep': ' (',
+            'ID': 'FoamWhereUsed'
+        },
+        'Comment, if any': {
+            'n': 5,
+            'list': '',
+            'sep': ')',
+            'ID': 'FoamComment'
+        }
+    }
+}
 # print(Nomenclatures['F&T Coil']['Parameters'].keys())
 # print(json.dumps(Nomenclatures))

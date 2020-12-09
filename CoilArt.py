@@ -25,6 +25,42 @@ def Name(conn, PNList):
     return Names
 
 
+def UnitID(AXconn, PN):
+    unit = []
+    with AXconn:
+        cursor = AXconn.cursor()
+        cursor.execute("""
+            SELECT BOMUNITID
+            FROM InventTable
+            WHERE ITEMID = ?
+            """, PN)
+        unit.append(cursor.fetchall()[
+                    0][0])  # check with 148-0102-017 #######################
+    return unit
+
+
+def cleanZeroLevel(PN, AXconn):
+    """
+    Return clean dataframe of Zero level with descriptions in the following order
+    PN, Unit, Qty, Description
+    using my functions defined in CoilArt.py
+    """
+    with AXconn:
+        PNs, Qty, Unit = Zero(AXconn, PN)
+    df = pd.DataFrame({
+        "PN": PNs,
+        "Qty": Qty,
+        "Unit": Unit
+    })
+    df = df.groupby(['PN', 'Unit']).sum()
+    df.reset_index(level=['PN', 'Unit'], inplace=True)
+    PNs = list(df.loc[:, 'PN'])
+    with AXconn:
+        Description = Name(AXconn, PNs)
+    df['Description'] = Description
+    return df
+
+
 def Zero(conn, Item, Qty=1, Unit="EA"):
     PNList, BOMQTYList, UNITIDList = [], [], []
     PNcontainer, BOMQTYcontainer, UNITIDcontainer = Item_extract(conn, Item)
@@ -88,28 +124,6 @@ def IsBOM(conn, ITEMID):
     return BOMID[0][0]
 
 
-def cleanZeroLevel(PN, AXconn):
-    """
-    Return clean dataframe of Zero level with descriptions in the following order
-    PN, Unit, Qty, Description
-    using my functions defined in CoilArt.py
-    """
-    with AXconn:
-        PNs, Qty, Unit = Zero(AXconn, PN)
-    df = pd.DataFrame({
-        "PN": PNs,
-        "Qty": Qty,
-        "Unit": Unit
-    })
-    df = df.groupby(['PN', 'Unit']).sum()
-    df.reset_index(level=['PN', 'Unit'], inplace=True)
-    PNs = list(df.loc[:, 'PN'])
-    with AXconn:
-        Description = Name(AXconn, PNs)
-    df['Description'] = Description
-    return df
-
-
 def initmenu(ACCconn):
     """
     Return dict where keys are the Selector ID and values are options list.
@@ -132,3 +146,88 @@ def initmenu(ACCconn):
     menu["FTDiameter"] = list(FTDiameter["FTDiameter"].values.tolist())
 
     return menu
+
+
+def std_cost(ACCconn, PN):
+    """
+    Return direct mateial standard cost of one item or list of items
+    """
+    with ACCconn:
+        cur = ACCconn.cursor()
+        cur.execute("""
+            SELECT Unit, V_price, V_Currency, 
+            Bank_Charge_Percentage, Customs_Percentage, 
+            Clearnace, Frieght, Frieght_Currency, Insurance, 
+            Insurance_Currency, eight_Percent, Others_Percent, Volume 
+            FROM DMCStandard WHERE PN= ?""", PN)
+        data = cur.fetchall()  # list of tuples
+    [(Unit, V_price, V_Currency,
+      Bank_Charge_Percentage, Customs_Percentage,
+      Clearnace, Frieght, Frieght_Currency, Insurance,
+      Insurance_Currency, eight_Percent, Others_Percent, Volume)] = data
+    print(data)
+    TotalLandedCost = ((V_price*(1+Bank_Charge_Percentage)*(1+Customs_Percentage))
+                       * exchange_rate(V_Currency)) + (Clearnace/Volume) + (Frieght*exchange_rate(Frieght_Currency)/Volume) + ((Insurance*exchange_rate(Insurance_Currency))/Volume) + (eight_Percent+Others_Percent)
+
+    details = {"Unit": Unit,
+               "V_price": V_price,
+               "V_Currency": V_Currency,
+               "Bank_Charge_Percentage": Bank_Charge_Percentage,
+               "Customs_Percentage": Customs_Percentage,
+               "Clearnace": Clearnace,
+               "Frieght": Frieght,
+               "Frieght_Currency": Frieght_Currency,
+               "Insurance": Insurance,
+               "Insurance_Currency": Insurance_Currency,
+               "eight_Percent": eight_Percent,
+               "Others_Percent": Others_Percent,
+               "Volume": Volume}
+    return TotalLandedCost, Unit, details
+
+
+def exchange_rate(Currency):
+    if Currency == "EUR":
+        return 18.55
+    elif Currency == "EGP":
+        return 1
+    elif Currency == "USD":
+        return 15.74
+
+
+def avg_cost(conn, PN):
+    with conn:
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT TOP 1 INVENTTRANS.COSTAMOUNTPOSTED/INVENTTRANS.QTY
+            FROM INVENTTRANS 
+            INNER JOIN INVENTTRANSORIGIN ON 
+            INVENTTRANS.ITEMID = INVENTTRANSORIGIN.ITEMID AND 
+            INVENTTRANS.INVENTTRANSORIGIN = INVENTTRANSORIGIN.RECID 
+            LEFT OUTER JOIN INVENTDIM ON 
+            INVENTTRANSORIGIN.ITEMINVENTDIMID = INVENTDIM.INVENTDIMID AND 
+            INVENTTRANS.INVENTDIMID = INVENTDIM.INVENTDIMID
+            WHERE INVENTTRANS.ITEMID = ?
+            AND INVENTTRANSORIGIN.REFERENCECATEGORY= 7
+            AND INVENTTRANS.STATUSRECEIPT = 1
+            ORDER BY INVENTTRANS.DATEFINANCIAL DESC""", PN)
+        data = cur.fetchall()
+    return data[0]
+
+
+def pur_cost(AXconn, PN):
+    with AXconn:
+        cur = AXconn.cursor()
+        cur.execute("""
+            SELECT TOP 1 INVENTTRANS.COSTAMOUNTPOSTED/INVENTTRANS.QTY
+            FROM INVENTTRANS 
+            INNER JOIN INVENTTRANSORIGIN 
+            ON INVENTTRANS.ITEMID = INVENTTRANSORIGIN.ITEMID 
+            AND INVENTTRANS.INVENTTRANSORIGIN = INVENTTRANSORIGIN.RECID 
+            LEFT OUTER JOIN INVENTDIM 
+            ON INVENTTRANSORIGIN.ITEMINVENTDIMID = INVENTDIM.INVENTDIMID
+            AND INVENTTRANS.INVENTDIMID = INVENTDIM.INVENTDIMID
+            WHERE INVENTTRANS.ITEMID = ?
+            AND INVENTTRANSORIGIN.REFERENCECATEGORY= 3
+            ORDER BY INVENTTRANS.DATEFINANCIAL DESC""", PN)
+        data = cur.fetchall()
+    return data[0]

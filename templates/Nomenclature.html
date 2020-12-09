@@ -98,44 +98,6 @@
 
     var obj = JSON.parse('{{Nomenclatures | tojson | safe}}');
 
-    // predefined nomenctature
-    /*
-    function CodeBtnFunction() {
-        // check user inputs
-        InputCheck();
-
-        let group = document.querySelector('#WhatSelector').value;
-
-        let card = document.querySelector('#WhatSelector').value;
-        if (card == "FT") {
-            let V = "";
-            if (document.querySelector('#FT_V-shape').checked) {
-                V = "v-";
-            }
-            let type = document.querySelector('#FT_Type').value;
-            let material = document.querySelector('#FT_Material').value;
-            let pattern = document.querySelector('#FT_Pattern').value;
-            let FPI = document.querySelector('#FT_FPI').value;
-            let R = document.querySelector('#FT_Rows').value;
-            let T = document.querySelector('#FT_Tubes').value;
-            let Core = document.querySelector('#FT_Core').value;
-            let C = document.querySelector('#FT_circuits').value;
-            let comment = document.querySelector('#FT_Comment').value;
-
-            let Name = "FT " + V + type + " " + material + "-" + pattern + "-" + FPI + "-" + R + "R" + T + "T" + "-" +
-                Core + "-" + C + " (" + comment + ")";
-
-            const table = document.getElementById("TableBody");
-            let row = table.insertRow();
-            row.insertCell(0).innerHTML = 'Not Implementet yet';
-            row.insertCell(1).innerHTML = Name;
-            row.insertCell(2).innerHTML = 'EA';
-        } else if (card == "PFCoil") {
-            // convert to template
-        }
-    }
-    */
-
     // template from JSON object
     function CodeBtnFunction() {
         // check user inputs
@@ -155,16 +117,22 @@
             name = name + user_input + sep;
         }
 
+        // extra toning on name due to JSON special character restrictions
         // replace every underscore into space
         name = name.replace(/_/g, " ");
         // replace every inch into "
         name = name.replace(/inch/g, '\"');
         // replace every -- into -
         name = name.replace(/--/g, '-');
+        // remove Sub ID
+        name = name.replace(/Sub /g, '');
+        // remove empty parenthesis 
+        name = name.replace(/\(\)/g, '');
+
 
         const table = document.getElementById("TableBody");
         let row = table.insertRow();
-        row.insertCell(0).innerHTML = 'Not Implementet yet';
+        row.insertCell(0).innerHTML = 'AX connection not found';
         row.insertCell(1).innerHTML = name;
         row.insertCell(2).innerHTML = 'EA';
     }

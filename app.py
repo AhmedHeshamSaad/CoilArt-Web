@@ -1,13 +1,15 @@
-from flask import Flask, redirect, render_template, request, send_from_directory, abort
+from flask import Flask, redirect, render_template, request, send_from_directory, abort, flash, url_for
 import pandas as pd
 import pyodbc
-from CoilArt import Zero, Name, cleanZeroLevel, initmenu
+from CoilArt import Zero, Name, cleanZeroLevel, initmenu, std_cost, avg_cost, UnitID, pur_cost
 import time
 import sqlite3
 from Nomenclature import Nomenclatures
 import json
+import re
 
 app = Flask(__name__)
+app.secret_key = 'Hesham'
 
 AXconn = pyodbc.connect('Driver={ODBC Driver 17 for SQL Server};'
                         'Server=SQL-SERVER;'
@@ -39,13 +41,14 @@ def ZeroLevel():
             df = cleanZeroLevel(PN, AXconn)
         except:
             return render_template("ZeroLevel.html", PN="_", FileName_ZeroLevel="_")
+            print("# Extraction Failed")
             # alert("Unvalid input")
 
         # export to excel file if user gonna download it
         if request.form.getlist("checkbox"):
             timestr = time.strftime("%Y%m%d-%H%M%S")
             FileName_ZeroLevel = PN + " ZeroLevel " + timestr + ".xlsx"
-            with pd.ExcelWriter(Path_ZeroLevel + FileName_ZeroLevel) as writer:
+            with pd.ExcelWriter(Path_ZeroLevel + FileName_ZeroLevel) as writer:  # pylint: disable=abstract-class-instantiated
                 df.to_excel(writer, sheet_name='Zerolevel')
 
         # return date to the template
@@ -77,8 +80,96 @@ def ACC():
 
 @app.route("/Nomenclature")
 def Nomenclature():
-    a = json.dumps([Nomenclatures])
-    return render_template("Nomenclature.html", Nomenclatures=Nomenclatures, Nomenclatures_json=a)
+    return render_template("Nomenclature.html", Nomenclatures=Nomenclatures)
+
+
+@app.route("/TotalLandedCost", methods=["GET", "POST"])
+def TotalLandedCost():
+    fly = {
+        "PN": "PN",
+        "std_cost": "_",
+        "avg_cost": "_",
+        "std_unit": "unit",
+        "avg_unit": "unit",
+        "name": "name",
+        "Details": ""
+    }
+    if request.method == "POST":
+        if request.form["button"] == "calculate":
+            PN = request.form.get("PN")
+            print('####################################################')
+            print(PN)
+            fly["PN"] = PN
+
+            #  cost from AX
+            with AXconn:
+                fly["avg_unit"] = UnitID(AXconn, [PN])[0]
+                try:
+                    fly["avg_cost"] = f'{avg_cost(AXconn, [PN])[0]: .2f}'
+                except:
+                    try:
+                        fly["avg_cost"] = f'{pur_cost(AXconn, [PN])[0]: .2f}'
+                    except:
+                        pass
+                try:
+                    fly["name"] = Name(AXconn, [PN])[0]
+                except:
+                    pass
+
+            # In case any error, return to empty TotalLandedCost page
+            try:
+                cost, unit, details = std_cost(ACCconn, [PN])
+                print(cost)
+                fly["std_cost"] = f'{cost: .2f}'
+                fly["std_unit"] = unit
+                fly["Details"] = details
+            except:
+                # alert("Unvalid input")
+                # return render_template("TotalLandedCost.html", fly=fly)
+                print("not pass")
+                pass
+
+            print('####################################################')
+            # a = json.dumps([fly])
+            return render_template("TotalLandedCost.html", fly=fly)
+    elif request.method == "GET":
+        return render_template("TotalLandedCost.html", fly=fly)
+
+
+@app.route("/TotalLandedCostWrite", methods=["GET", "POST"])
+def TotalLandedCostWrite():
+    if request.method == "POST":
+        # if re.search("\A\d{3}-\d{4}-\d{3}\Z", txt) else return ""
+        PN = request.form.get('PN')
+        Unit = request.form.get('Unit')
+        V_price = request.form.get('V_price')
+        V_Currency = request.form.get('V_Currency')
+        Frieght = request.form.get('Frieght')
+        Frieght_Currency = request.form.get('Frieght_Currency')
+        Insurance = request.form.get('Insurance')
+        Insurance_Currency = request.form.get('Insurance_Currency')
+        Bank_Charge_Percentage = float(
+            request.form.get('Bank_Charge_Percentage')) / 100
+        Customs_Percentage = float(
+            request.form.get('Customs_Percentage')) / 100
+        Clearnace = request.form.get('Clearnace')
+        eight_Percent = request.form.get('eight_Percent')
+        Others_Percent = request.form.get('Others_Percent')
+        Volume = request.form.get('Volume')
+
+        with ACCconn:
+            cursor = ACCconn.cursor()
+
+            cursor.execute("""
+                    INSERT OR REPLACE INTO DMCStandard(PN, Unit, V_price, V_Currency, Frieght, Frieght_Currency, Insurance, Insurance_Currency,
+                    Bank_Charge_Percentage, Customs_Percentage, Clearnace, eight_Percent, Others_Percent, Volume) 
+                    VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?);
+                """, (PN, Unit, V_price, V_Currency, Frieght, Frieght_Currency, Insurance, Insurance_Currency,
+                           Bank_Charge_Percentage, Customs_Percentage, Clearnace, eight_Percent, Others_Percent,
+                           Volume))
+            AXconn.commit()
+
+        return "Successful Write!"
 
 
 if __name__ == "__main__":

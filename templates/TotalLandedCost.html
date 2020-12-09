@@ -1,0 +1,243 @@
+{% extends "layout-SB2.html" %}
+
+{% block body %}
+<h1 class="h3 mb-0 font-weight-bold text-primary">Total Landed Cost:</h1>
+<p class="mb-4">Enter part number to calculate its total landed cost.</p>
+
+<!-- Topbar Search -->
+<div class="row mb-4">
+    <!-- calculate form -->
+    <div class="col-xl-6 mb-3">
+        <form action="/TotalLandedCost" method="POST"
+            class="d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
+            <div class="input-group">
+                <input name="PN" id="PN" type="text" class="form-control bg-gray border-1 small"
+                    placeholder={{fly["PN"]}} aria-label="Search" aria-describedby="basic-addon2"
+                    value={% if fly["PN"] != "PN" %} {{fly["PN"]}} {% endif %}>
+                <div class="input-group-append">
+                    <button class="btn btn-primary" type="submit" name="button" value="calculate">
+                        <i class="fas fa-calculator fa-sm"> </i>
+                        Calculate
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <!-- cost text output -->
+    <div class="col-xl-6">
+        <h3 class="text-gray-800 pr-3 float-right"> STD Cost: {{fly["std_cost"]}} EGP/{{fly["std_unit"]}} </h3>
+        <h3 class="text-gray-800 pr-3 float-right"> WAVG Cost: {{fly["avg_cost"]}} EGP/{{fly["avg_unit"]}}
+        </h3>
+    </div>
+</div>
+
+<!-- Details card-->
+<!-- <form action="/TotalLandedCost/{{fly["PN"]}}" method="POST"> -->
+<div class="card shadow mb-4">
+    <!-- Header -->
+    <div class="card-header py-1">
+        <div class="row">
+            <div class="col">
+                <h6 class="my-2 font-weight-bold text-primary">{{fly["PN"]}}: {{fly["name"]}}</h6>
+            </div>
+        </div>
+    </div>
+    <div class="card-body row">
+        <!-- Unit, Vendpr price, freight, Insurance -->
+        <div class="col-sm-4">
+            <div class="form-group row no-gutters">
+                <label for="Unit" class="col-xl-6 col-form-label">Unit</label>
+                <div class="col-xl-6 row">
+                    <div class="col-6"></div>
+                    <div class="dropdown col-6 float right">
+                        <select name="Unit" id="Unit" class="form-control btn btn-secondary btn-sm dropdown-toggle"
+                            aria-haspopup="true" aria-expanded="false" autocomplete="off">
+                            <div class="dropdown-menu" aria-labelledby="Unit">
+                                <option disabled selected value> Unit </option>
+                                <option value="KG">KG</option>
+                                <option value="MT">MT</option>
+                                <option value="EA">EA</option>
+                                <option value="SM">SM</option>
+                            </div>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group row no-gutters">
+                <label for="V_price" class="col-xl-6 col-form-label">Vendor Price</label>
+                <div class="col-xl-6 row">
+                    <input type="text" class="form-control col-6" id="V_price" name="V_price" value="">
+                    <div class="dropdown col-6">
+                        <select name="V_Currency" id="V_Currency"
+                            class="form-control btn btn-secondary btn-sm dropdown-toggle" aria-haspopup="true"
+                            aria-expanded="false" autocomplete="off">
+                            <div class="dropdown-menu" aria-labelledby="V_Price">
+                                <option disabled selected value> CUR. </option>
+                                <option value="EGP">EGP</option>
+                                <option value="EUR">EUR</option>
+                                <option value="USD">USD</option>
+                            </div>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group row no-gutters">
+                <label for="Frieght" class="col-xl-6 col-form-label">Frieght</label>
+                <div class="col-xl-6 row">
+                    <input type="text" class="form-control col-6" id="Frieght" name="Frieght" value="">
+                    <div class="dropdown col-6">
+                        <select name="Frieght_Currency" id="Frieght_Currency"
+                            class="form-control btn btn-secondary btn-sm dropdown-toggle" aria-haspopup="true"
+                            aria-expanded="false" autocomplete="off">
+                            <div class="dropdown-menu" aria-labelledby="Frieght">
+                                <option disabled selected value> CUR. </option>
+                                <option value="EGP">EGP</option>
+                                <option value="EUR">EUR</option>
+                                <option value="USD">USD</option>
+                            </div>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group row no-gutters">
+                <label for="Insurance" class="col-xl-6 col-form-label">Insurance</label>
+                <div class="col-xl-6 row">
+                    <input type="text" class="form-control col-6" id="Insurance" name="Insurance" value="">
+                    <div class="dropdown col-6">
+                        <select name="Insurance_Currency" id="Insurance_Currency"
+                            class="form-control btn btn-secondary btn-sm dropdown-toggle" aria-haspopup="true"
+                            aria-expanded="false" autocomplete="off">
+                            <div class="dropdown-menu" aria-labelledby="Insurance">
+                                <option disabled selected value> CUR. </option>
+                                <option value="EGP">EGP</option>
+                                <option value="EUR">EUR</option>
+                                <option value="USD">USD</option>
+                            </div>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Bank charges, customs, clearance -->
+        <div class="col-sm-4">
+
+            <div class="form-group row no-gutters">
+                <label for="Bank_Charge" class="col-xl-6 col-form-label">Bank Charges</label>
+                <div class="col-xl-6 row">
+                    <input type="text" class="form-control col-6" id="Bank_Charge_Percentage"
+                        name="Bank_Charge_Percentage" value="">
+                    <h3 class="col-6 col-form-label">%</h3>
+                </div>
+            </div>
+
+            <div class="form-group row no-gutters">
+                <label for="Customs_Percentage" class="col-xl-6 col-form-label">Customs Percentage</label>
+                <div class="col-xl-6 row">
+                    <input type="text" class="form-control col-6" id="Customs_Percentage" name="Customs_Percentage"
+                        value="">
+                    <h3 class="col-6 col-form-label">%</h3>
+                </div>
+            </div>
+
+            <div class="form-group row no-gutters">
+                <label for="Clearnace" class="col-xl-6 col-form-label">Clearnace</label>
+                <div class="col-xl-6 row">
+                    <input type="text" class="form-control col-6" id="Clearnace" name="Clearnace" value="">
+                    <h2 class="col-6 col-form-label">EGP</h2>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- 8%, others, volume -->
+        <div class="col-sm-4">
+
+            <div class="form-group row no-gutters">
+                <label for="eight_Percent" class="col-xl-6 col-form-label">8%</label>
+                <div class="col-xl-6 row">
+                    <input type="text" class="form-control col-6" id="eight_Percent" name="eight_Percent" value="">
+                    <h3 class="col-6 col-form-label">EGP</h3>
+                </div>
+            </div>
+
+            <div class="form-group row no-gutters">
+                <label for="Others_Percent" class="col-xl-6 col-form-label">Other</label>
+                <div class="col-xl-6 row">
+                    <input type="text" class="form-control col-6" id="Others_Percent" name="Others_Percent" value="">
+                    <h3 class="col-6 col-form-label">EGP</h3>
+                </div>
+            </div>
+
+            <div class="form-group row no-gutters">
+                <label for="Volume" class="col-xl-6 col-form-label">Volume</label>
+                <div class="col-xl-6 row">
+                    <input type="text" class="form-control col-6" id="Volume" name="Volume" value="">
+                    <h2 class="col-6 col-form-label">EA</h2>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Write button -->
+        <div class="row px-4">
+            <p></p>
+            <button type="button" onclick="write_button()" class="btn btn-primary float-right" name="button">
+                <i class="fas fa-save fa-sm"></i>
+                Write
+            </button>
+        </div>
+
+    </div>
+</div>
+<!-- </form> -->
+
+<script>
+    var fly = JSON.parse('{{fly["Details"] | tojson | safe}}');
+
+    if (Object.keys(fly).length != 0) {
+        document.querySelector('#Unit').value = fly.Unit;
+        document.querySelector('#V_price').value = fly.V_price;
+        document.querySelector('#V_Currency').value = fly.V_Currency;
+        document.querySelector('#Frieght').value = fly.Frieght;
+        document.querySelector('#Frieght_Currency').value = fly.Frieght_Currency;
+        document.querySelector('#Insurance').value = fly.Insurance;
+        document.querySelector('#Insurance_Currency').value = fly.Insurance_Currency;
+        document.querySelector('#Bank_Charge_Percentage').value = fly.Bank_Charge_Percentage * 100;
+        document.querySelector('#Customs_Percentage').value = fly.Customs_Percentage * 100;
+        document.querySelector('#Clearnace').value = fly.Clearnace;
+        document.querySelector('#eight_Percent').value = fly.eight_Percent;
+        document.querySelector('#Others_Percent').value = fly.Others_Percent;
+        document.querySelector('#Volume').value = fly.Volume;
+    }
+
+    function write_button() {
+        dict = {
+            PN: document.querySelector('#PN').value,
+            Unit: document.querySelector('#Unit').value,
+            V_price: document.querySelector('#V_price').value,
+            V_Currency: document.querySelector('#V_Currency').value,
+            Frieght: document.querySelector('#Frieght').value,
+            Frieght_Currency: document.querySelector('#Frieght_Currency').value,
+            Insurance: document.querySelector('#Insurance').value,
+            Insurance_Currency: document.querySelector('#Insurance_Currency').value,
+            Bank_Charge_Percentage: document.querySelector('#Bank_Charge_Percentage').value,
+            Customs_Percentage: document.querySelector('#Customs_Percentage').value,
+            Clearnace: document.querySelector('#Clearnace').value,
+            eight_Percent: document.querySelector('#eight_Percent').value,
+            Others_Percent: document.querySelector('#Others_Percent').value,
+            Volume: document.querySelector('#Volume').value
+        };
+
+        $.post("TotalLandedCostWrite",
+            dict,
+            function (data, status) {
+                alert(data);
+            });
+    }
+</script>
+{% endblock %}
