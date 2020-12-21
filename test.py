@@ -2,6 +2,8 @@
 import pyodbc
 from CoilArt import *
 import sqlite3
+from datetime import datetime
+
 # import sqlite3
 
 AXconn = pyodbc.connect('Driver={SQL Server};'
@@ -13,7 +15,11 @@ Path_SQLite3Database = "D:\\redirect\\Desktop\\CoilArt-Web\\static\\database\\"
 ACCconn = sqlite3.connect(Path_SQLite3Database +
                           "ACC.db", check_same_thread=False)
 
-print(std_cost(ACCconn, ["148-0102-001"]))
+PN = "144-0000-002"
+COSTAMOUNTSETTLED, QTYSETTLED, date = pur_cost(AXconn, [PN])
+# cost = COSTAMOUNTSETTLED / QTYSETTLED
+print(COSTAMOUNTSETTLED, QTYSETTLED, date)
+
 
 # Path_SQLite3Database = "D:\\redirect\\Desktop\\CoilArt-Web\\static\\database\\"
 # ACCconn = sqlite3.connect(Path_SQLite3Database +

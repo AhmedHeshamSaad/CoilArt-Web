@@ -148,7 +148,7 @@ def initmenu(ACCconn):
     return menu
 
 
-def std_cost(ACCconn, PN):
+def std_cost(ACCconn, PN, rate):
     """
     Return direct mateial standard cost of one item or list of items
     """
@@ -158,16 +158,17 @@ def std_cost(ACCconn, PN):
             SELECT Unit, V_price, V_Currency, 
             Bank_Charge_Percentage, Customs_Percentage, 
             Clearnace, Frieght, Frieght_Currency, Insurance, 
-            Insurance_Currency, eight_Percent, Others_Percent, Volume 
+            Insurance_Currency, eight_Percent, Others_Percent, Volume, Date 
             FROM DMCStandard WHERE PN= ?""", PN)
         data = cur.fetchall()  # list of tuples
     [(Unit, V_price, V_Currency,
       Bank_Charge_Percentage, Customs_Percentage,
       Clearnace, Frieght, Frieght_Currency, Insurance,
-      Insurance_Currency, eight_Percent, Others_Percent, Volume)] = data
+      Insurance_Currency, eight_Percent, Others_Percent, Volume, Date)] = data
     print(data)
+    # rate = exchange_rate()
     TotalLandedCost = ((V_price*(1+Bank_Charge_Percentage)*(1+Customs_Percentage))
-                       * exchange_rate(V_Currency)) + (Clearnace/Volume) + (Frieght*exchange_rate(Frieght_Currency)/Volume) + ((Insurance*exchange_rate(Insurance_Currency))/Volume) + (eight_Percent+Others_Percent)
+                       * rate[V_Currency]) + (Clearnace/Volume) + (Frieght*rate[Frieght_Currency]/Volume) + ((Insurance*rate[Insurance_Currency])/Volume) + (eight_Percent+Others_Percent)
 
     details = {"Unit": Unit,
                "V_price": V_price,
@@ -181,34 +182,53 @@ def std_cost(ACCconn, PN):
                "Insurance_Currency": Insurance_Currency,
                "eight_Percent": eight_Percent,
                "Others_Percent": Others_Percent,
-               "Volume": Volume}
+               "Volume": Volume,
+               "Date": Date}
     return TotalLandedCost, Unit, details
 
 
-def exchange_rate(Currency):
-    if Currency == "EUR":
-        return 18.55
-    elif Currency == "EGP":
-        return 1
-    elif Currency == "USD":
-        return 15.74
+def exchange_rate():
+    import urllib.request as urllib2
+    from bs4 import BeautifulSoup
+
+    url = 'https://www.cbe.org.eg/ar/EconomicResearch/Statistics/Pages/ExchangeRatesListing.aspx'
+    page = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+    response = urllib2.urlopen(page, timeout=50)
+    html = response.read()
+    soup = BeautifulSoup(html, 'html.parser')
+
+    tables = soup.find_all('table')
+    tbody = tables[2].find('tbody')
+    trs = tbody.find_all('tr')
+
+    USD = float(trs[0].find_all('td')[2].get_text())
+    EUR = float(trs[1].find_all('td')[2].get_text())
+    JPY = float(trs[4].find_all('td')[2].get_text())
+
+    rate = {
+        "EGP": 1,
+        "USD": USD,
+        "EUR": EUR,
+        "JPY": JPY
+    }
+
+    return rate
 
 
 def avg_cost(conn, PN):
     with conn:
         cur = conn.cursor()
         cur.execute("""
-            SELECT TOP 1 INVENTTRANS.COSTAMOUNTPOSTED/INVENTTRANS.QTY
-            FROM INVENTTRANS 
+            SELECT TOP 1 INVENTTRANS.COSTAMOUNTPOSTED+INVENTTRANS.COSTAMOUNTADJUSTMENT, INVENTTRANS.QTY, INVENTTRANS.DATEFINANCIAL
+            FROM INVENTDIM 
+            INNER JOIN INVENTTRANS ON 
+            INVENTDIM.INVENTDIMID = INVENTTRANS.INVENTDIMID
             INNER JOIN INVENTTRANSORIGIN ON 
-            INVENTTRANS.ITEMID = INVENTTRANSORIGIN.ITEMID AND 
-            INVENTTRANS.INVENTTRANSORIGIN = INVENTTRANSORIGIN.RECID 
-            LEFT OUTER JOIN INVENTDIM ON 
-            INVENTTRANSORIGIN.ITEMINVENTDIMID = INVENTDIM.INVENTDIMID AND 
-            INVENTTRANS.INVENTDIMID = INVENTDIM.INVENTDIMID
+            INVENTTRANS.INVENTTRANSORIGIN = INVENTTRANSORIGIN.RECID
             WHERE INVENTTRANS.ITEMID = ?
+            AND INVENTTRANS.STATUSRECEIPT=1
             AND INVENTTRANSORIGIN.REFERENCECATEGORY= 7
-            AND INVENTTRANS.STATUSRECEIPT = 1
+            AND INVENTDIM.INVENTLOCATIONID ='RM'
             ORDER BY INVENTTRANS.DATEFINANCIAL DESC""", PN)
         data = cur.fetchall()
     return data[0]
@@ -218,16 +238,24 @@ def pur_cost(AXconn, PN):
     with AXconn:
         cur = AXconn.cursor()
         cur.execute("""
-            SELECT TOP 1 INVENTTRANS.COSTAMOUNTPOSTED/INVENTTRANS.QTY
-            FROM INVENTTRANS 
-            INNER JOIN INVENTTRANSORIGIN 
-            ON INVENTTRANS.ITEMID = INVENTTRANSORIGIN.ITEMID 
-            AND INVENTTRANS.INVENTTRANSORIGIN = INVENTTRANSORIGIN.RECID 
-            LEFT OUTER JOIN INVENTDIM 
-            ON INVENTTRANSORIGIN.ITEMINVENTDIMID = INVENTDIM.INVENTDIMID
-            AND INVENTTRANS.INVENTDIMID = INVENTDIM.INVENTDIMID
+            SELECT TOP 1 INVENTTRANS.COSTAMOUNTPOSTED+INVENTTRANS.COSTAMOUNTADJUSTMENT, INVENTTRANS.QTY, INVENTTRANS.DATEFINANCIAL
+            FROM INVENTDIM 
+            INNER JOIN INVENTTRANS ON 
+            INVENTDIM.INVENTDIMID = INVENTTRANS.INVENTDIMID
+            INNER JOIN INVENTTRANSORIGIN ON 
+            INVENTTRANS.INVENTTRANSORIGIN = INVENTTRANSORIGIN.RECID
             WHERE INVENTTRANS.ITEMID = ?
+            AND INVENTTRANS.STATUSRECEIPT=1
             AND INVENTTRANSORIGIN.REFERENCECATEGORY= 3
+            AND INVENTDIM.INVENTLOCATIONID ='RM'
             ORDER BY INVENTTRANS.DATEFINANCIAL DESC""", PN)
         data = cur.fetchall()
     return data[0]
+
+
+def is_number(s):
+    try:
+        float(s)
+        return True
+    except:
+        return False

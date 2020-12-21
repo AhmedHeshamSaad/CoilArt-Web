@@ -5,34 +5,71 @@
 <p class="mb-4">Enter part number to calculate its total landed cost.</p>
 
 <!-- Topbar Search -->
-<div class="row mb-4">
-    <!-- calculate form -->
-    <div class="col-xl-6 mb-3">
-        <form action="/TotalLandedCost" method="POST"
-            class="d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
-            <div class="input-group">
-                <input name="PN" id="PN" type="text" class="form-control bg-gray border-1 small"
-                    placeholder={{fly["PN"]}} aria-label="Search" aria-describedby="basic-addon2"
-                    value={% if fly["PN"] != "PN" %} {{fly["PN"]}} {% endif %}>
-                <div class="input-group-append">
-                    <button class="btn btn-primary" type="submit" name="button" value="calculate">
-                        <i class="fas fa-calculator fa-sm"> </i>
-                        Calculate
-                    </button>
+<div class="container-fluid px-0">
+    <div class="row">
+        <!-- calculate form -->
+        <div class="col-xl-6">
+            <form action="/TotalLandedCost" method="POST"
+                class="d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
+                <div class="input-group">
+                    <input name="PN" id="PN" type="text" class="form-control bg-gray border-1 small"
+                        placeholder={{fly["PN"]}} aria-label="Search" aria-describedby="basic-addon2"
+                        value={% if fly["PN"] != "PN" %} {{fly["PN"]}} {% endif %}>
+                    <div class="input-group-append">
+                        <button class="btn btn-primary" type="submit" name="button" value="calculate">
+                            <i class="fas fa-calculator fa-sm"> </i>
+                            Calculate
+                        </button>
+                    </div>
+                </div>
+            </form>
+
+            <div class="ml-3 mb-2">
+                <p class="mb-0 mt-2">Exchange Rates:</p>
+                <p class="mb-0">
+                    USD: {{ "%.2f"|format(fly["rate"]["USD"]) }},
+                    EUR: {{ "%.2f"|format(fly["rate"]["EUR"]) }},
+                    JPY: {{ "%.2f"|format(fly["rate"]["JPY"]) }}
+                </p>
+            </div>
+
+        </div>
+
+        <!-- cost text output -->
+        <div class="col-xl-6">
+            <div class="row">
+                <div class="col-6">
+                    <h5 class="text-gray-800 pr-3 mb-0">STD Cost:</h5>
+                    <p>{{fly["std_cost_date"]}}</p>
+                </div>
+                <div class="col-6">
+                    <h5 class="text-gray-800 pr-3 float-right">{{fly["std_cost"]}} EGP/{{fly["std_unit"]}}</h5>
                 </div>
             </div>
-        </form>
-    </div>
-    <!-- cost text output -->
-    <div class="col-xl-6">
-        <h3 class="text-gray-800 pr-3 float-right"> STD Cost: {{fly["std_cost"]}} EGP/{{fly["std_unit"]}} </h3>
-        <h3 class="text-gray-800 pr-3 float-right"> WAVG Cost: {{fly["avg_cost"]}} EGP/{{fly["avg_unit"]}}
-        </h3>
+            <div class="row">
+                <div class="col-6">
+                    <h5 class="text-gray-800 pr-3 mb-0">W. AVG. Cost:</h5>
+                    <p>{{fly["avg_cost_date"]}}</p>
+                </div>
+                <div class="col-6">
+                    <h5 class="text-gray-800 pr-3 float-right">{{fly["avg_cost"]}} EGP/{{fly["invent_unit"]}}</h5>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-6">
+                    <h5 class="text-gray-800 pr-3 mb-0">Last Pur. Cost:</h5>
+                    <p>{{fly["last_cost_date"]}}</p>
+                </div>
+                <div class="col-6">
+                    <h5 class="text-gray-800 pr-3 float-right">{{fly["last_cost"]}} EGP/{{fly["invent_unit"]}}</h5>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
+
 <!-- Details card-->
-<!-- <form action="/TotalLandedCost/{{fly["PN"]}}" method="POST"> -->
 <div class="card shadow mb-4">
     <!-- Header -->
     <div class="card-header py-1">
@@ -45,35 +82,17 @@
     <div class="card-body row">
         <!-- Unit, Vendpr price, freight, Insurance -->
         <div class="col-sm-4">
-            <div class="form-group row no-gutters">
-                <label for="Unit" class="col-xl-6 col-form-label">Unit</label>
-                <div class="col-xl-6 row">
-                    <div class="col-6"></div>
-                    <div class="dropdown col-6 float right">
-                        <select name="Unit" id="Unit" class="form-control btn btn-secondary btn-sm dropdown-toggle"
-                            aria-haspopup="true" aria-expanded="false" autocomplete="off">
-                            <div class="dropdown-menu" aria-labelledby="Unit">
-                                <option disabled selected value> Unit </option>
-                                <option value="KG">KG</option>
-                                <option value="MT">MT</option>
-                                <option value="EA">EA</option>
-                                <option value="SM">SM</option>
-                            </div>
-                        </select>
-                    </div>
-                </div>
-            </div>
 
             <div class="form-group row no-gutters">
                 <label for="V_price" class="col-xl-6 col-form-label">Vendor Price</label>
                 <div class="col-xl-6 row">
-                    <input type="text" class="form-control col-6" id="V_price" name="V_price" value="">
+                    <input type="text" class="form-control col-6" id="V_price" name="V_price" value="" placeholder=0>
                     <div class="dropdown col-6">
                         <select name="V_Currency" id="V_Currency"
                             class="form-control btn btn-secondary btn-sm dropdown-toggle" aria-haspopup="true"
                             aria-expanded="false" autocomplete="off">
                             <div class="dropdown-menu" aria-labelledby="V_Price">
-                                <option disabled selected value> CUR. </option>
+                                <option disabled selected value="CUR"> CUR. </option>
                                 <option value="EGP">EGP</option>
                                 <option value="EUR">EUR</option>
                                 <option value="USD">USD</option>
@@ -86,13 +105,13 @@
             <div class="form-group row no-gutters">
                 <label for="Frieght" class="col-xl-6 col-form-label">Frieght</label>
                 <div class="col-xl-6 row">
-                    <input type="text" class="form-control col-6" id="Frieght" name="Frieght" value="">
+                    <input type="text" class="form-control col-6" id="Frieght" name="Frieght" value="" placeholder=0>
                     <div class="dropdown col-6">
                         <select name="Frieght_Currency" id="Frieght_Currency"
                             class="form-control btn btn-secondary btn-sm dropdown-toggle" aria-haspopup="true"
                             aria-expanded="false" autocomplete="off">
                             <div class="dropdown-menu" aria-labelledby="Frieght">
-                                <option disabled selected value> CUR. </option>
+                                <option disabled selected value="CUR"> CUR. </option>
                                 <option value="EGP">EGP</option>
                                 <option value="EUR">EUR</option>
                                 <option value="USD">USD</option>
@@ -105,13 +124,14 @@
             <div class="form-group row no-gutters">
                 <label for="Insurance" class="col-xl-6 col-form-label">Insurance</label>
                 <div class="col-xl-6 row">
-                    <input type="text" class="form-control col-6" id="Insurance" name="Insurance" value="">
+                    <input type="text" class="form-control col-6" id="Insurance" name="Insurance" value=""
+                        placeholder=0>
                     <div class="dropdown col-6">
                         <select name="Insurance_Currency" id="Insurance_Currency"
                             class="form-control btn btn-secondary btn-sm dropdown-toggle" aria-haspopup="true"
                             aria-expanded="false" autocomplete="off">
                             <div class="dropdown-menu" aria-labelledby="Insurance">
-                                <option disabled selected value> CUR. </option>
+                                <option disabled selected value="CUR"> CUR. </option>
                                 <option value="EGP">EGP</option>
                                 <option value="EUR">EUR</option>
                                 <option value="USD">USD</option>
@@ -130,7 +150,7 @@
                 <label for="Bank_Charge" class="col-xl-6 col-form-label">Bank Charges</label>
                 <div class="col-xl-6 row">
                     <input type="text" class="form-control col-6" id="Bank_Charge_Percentage"
-                        name="Bank_Charge_Percentage" value="">
+                        name="Bank_Charge_Percentage" value="" placeholder=0>
                     <h3 class="col-6 col-form-label">%</h3>
                 </div>
             </div>
@@ -139,7 +159,7 @@
                 <label for="Customs_Percentage" class="col-xl-6 col-form-label">Customs Percentage</label>
                 <div class="col-xl-6 row">
                     <input type="text" class="form-control col-6" id="Customs_Percentage" name="Customs_Percentage"
-                        value="">
+                        value="" placeholder=0>
                     <h3 class="col-6 col-form-label">%</h3>
                 </div>
             </div>
@@ -147,20 +167,41 @@
             <div class="form-group row no-gutters">
                 <label for="Clearnace" class="col-xl-6 col-form-label">Clearnace</label>
                 <div class="col-xl-6 row">
-                    <input type="text" class="form-control col-6" id="Clearnace" name="Clearnace" value="">
+                    <input type="text" class="form-control col-6" id="Clearnace" name="Clearnace" value=""
+                        placeholder=0>
                     <h2 class="col-6 col-form-label">EGP</h2>
                 </div>
             </div>
 
         </div>
 
-        <!-- 8%, others, volume -->
+        <!--volume, unit, 8%, others -->
         <div class="col-sm-4">
+
+            <div class="form-group row no-gutters">
+                <label for="Volume" class="col-xl-6 col-form-label">Volume</label>
+                <div class="col-xl-6 row">
+                    <input type="text" class="form-control col-6" id="Volume" name="Volume" value="" placeholder=1>
+                    <div class="dropdown col-6 float right">
+                        <select name="Unit" id="Unit" class="form-control btn btn-secondary btn-sm dropdown-toggle"
+                            aria-haspopup="true" aria-expanded="false" autocomplete="off">
+                            <div class="dropdown-menu" aria-labelledby="Unit">
+                                <option disabled selected value> Unit </option>
+                                <option value="KG">KG</option>
+                                <option value="MT">MT</option>
+                                <option value="EA">EA</option>
+                                <option value="SM">SM</option>
+                            </div>
+                        </select>
+                    </div>
+                </div>
+            </div>
 
             <div class="form-group row no-gutters">
                 <label for="eight_Percent" class="col-xl-6 col-form-label">8%</label>
                 <div class="col-xl-6 row">
-                    <input type="text" class="form-control col-6" id="eight_Percent" name="eight_Percent" value="">
+                    <input type="text" class="form-control col-6" id="eight_Percent" name="eight_Percent" value=""
+                        placeholder=0>
                     <h3 class="col-6 col-form-label">EGP</h3>
                 </div>
             </div>
@@ -168,16 +209,9 @@
             <div class="form-group row no-gutters">
                 <label for="Others_Percent" class="col-xl-6 col-form-label">Other</label>
                 <div class="col-xl-6 row">
-                    <input type="text" class="form-control col-6" id="Others_Percent" name="Others_Percent" value="">
+                    <input type="text" class="form-control col-6" id="Others_Percent" name="Others_Percent" value=""
+                        placeholder=0>
                     <h3 class="col-6 col-form-label">EGP</h3>
-                </div>
-            </div>
-
-            <div class="form-group row no-gutters">
-                <label for="Volume" class="col-xl-6 col-form-label">Volume</label>
-                <div class="col-xl-6 row">
-                    <input type="text" class="form-control col-6" id="Volume" name="Volume" value="">
-                    <h2 class="col-6 col-form-label">EA</h2>
                 </div>
             </div>
 
@@ -194,7 +228,7 @@
 
     </div>
 </div>
-<!-- </form> -->
+
 
 <script>
     var fly = JSON.parse('{{fly["Details"] | tojson | safe}}');
